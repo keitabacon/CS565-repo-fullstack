@@ -12,15 +12,6 @@ const port = process.env.PORT || 5001;
 
 // For other routes, such as http://localhost:5001/other, this exercise should return a status code 404 with '404 - page not found' in html format
 
-const routes = [
-  'welcome',
-  'redirect',
-  'redirected',
-  'cache',
-  'cookie',
-  'other',
-];
-
 app.get('/', (req, res) => {
   res.status(200);
   res.set({ 'Content-Type': 'text/html' });
@@ -51,6 +42,11 @@ app.get('/cookie', (req, res) => {
   res.type('text/plain');
   res.status(200).send('cookies… yummm');
 });
+
+app.use((req, res) => {
+  res.status(404).type('html').send('404 - page not found');
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

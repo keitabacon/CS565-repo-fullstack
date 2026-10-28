@@ -3,15 +3,15 @@
 // Add your function here
 
 const log = function takeArrayAndLog(money, array) {
-  //output string
+  // output string
   let output = '';
-  //loop through array
+  // loop through array
   for (let i = 0; i < array.length; i += 1) {
-    //if first add the money to the front
+    // if first add the money to the front
     if (i === 0) {
       output = `$${money} ==> ${String(array[i])}`;
     } else {
-      //else add the array content to the end of the current string
+      // else add the array content to the end of the current string
       output = `${output}, ${String(array[i])}`;
     }
   }
@@ -19,13 +19,17 @@ const log = function takeArrayAndLog(money, array) {
 };
 
 const calculateChange = function dollarsIntoCoins(money) {
+  // input validation
+  if (!Number.isFinite(amount) || amount < 0) {
+    return 'Error: Invalid input';
+  }
   if (money > 100) return `$${money} ==> Error: the number is too large`;
   if (money <= 0) return `$${money} ==> No Change back`;
   const forLogging = [];
-  // turn the decimal dollars into whole number cents and round it off
-  let cents = Math.round(money * 100);
   // for dollars truncate the cents off of original money
   const dollars = Math.trunc(money);
+  // turn the decimal dollars into whole number cents and round it off
+  let cents = Math.round(money * 100);
   // remove dollars worth off of cents
   cents %= 100;
   if (dollars) {

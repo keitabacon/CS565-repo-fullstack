@@ -39,6 +39,12 @@ app.get('/form', (req, res) => {
                             <label for="comments">Comments:</label>
                             <textarea id="comments" name="comments"></textarea>
                         </div>
+
+                        <div class="input-section">
+                            <label>Sign up for the newsletter</label>
+                            <input type="checkbox" name="newsletter" value="yes"> 
+                        </div>
+
             
                         <button type="submit">Submit</button>
                     </form>
@@ -51,7 +57,7 @@ app.get('/form', (req, res) => {
 
 // Process the submitted form
 app.post('/submit', (req, res) => {
-    const { username, email, comments } = req.body;
+    const { username, email, comments,newsletter } = req.body;
 
     res.status(200).send(`
       <!DOCTYPE html>
@@ -62,6 +68,7 @@ app.post('/submit', (req, res) => {
         </head>
         <body>
           <h1>We have sold your data</h1>
+          <p>Newsletter signup${newsletter}</p>
           <p>Thank god your not using PHP ${username}</p>
           <p>You would get so many emailes at ${email}</p>
           <p>${comments}</p>
