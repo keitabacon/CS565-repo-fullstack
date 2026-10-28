@@ -11,7 +11,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/form', (req, res) => {
-    res.status(200).send(`
+  res.status(200).send(`
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -57,9 +57,9 @@ app.get('/form', (req, res) => {
 
 // Process the submitted form
 app.post('/submit', (req, res) => {
-    const { username, email, comments,newsletter } = req.body;
+  const { username, email, comments, newsletter } = req.body;
 
-    res.status(200).send(`
+  res.status(200).send(`
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -79,9 +79,9 @@ app.post('/submit', (req, res) => {
 
 // Handle unmatched routes
 app.use((req, res) => {
-    res.status(404).send('<div>404 - page not found</div>');
+  res.status(404).send('<div>404 - page not found</div>');
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
