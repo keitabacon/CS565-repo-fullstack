@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import PropTypes from 'prop-types';
 import './styles.css';
 // nav bar options
 const pages = {
@@ -8,6 +9,15 @@ const pages = {
   populous: 'Populous countries',
   regions: 'Regions',
 };
+const countryType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  capitals: PropTypes.arrayOf(PropTypes.string).isRequired,
+  population: PropTypes.number,
+  flag: PropTypes.string.isRequired,
+  flagAlt: PropTypes.string.isRequired,
+});
+
 // find flag for the country passed through
 function Flag({ country }) {
   const [failed, setFailed] = useState(false);
@@ -23,6 +33,8 @@ function Flag({ country }) {
     />
   );
 }
+Flag.propTypes = { country: countryType.isRequired };
+
 // get country list
 function CountryList({ countries, populous }) {
   // if no countries found
@@ -40,12 +52,17 @@ function CountryList({ countries, populous }) {
       ) : (
         <>
           <p>Capital: {country.capitals.join(', ') || 'Unavailable'}</p>
-          <p>Leader: Unavailable</p>
+          <p>Currency: {country.currency || 'Unavailable'}</p>
         </>
       )}
     </article>
   ));
 }
+CountryList.propTypes = {
+  countries: PropTypes.arrayOf(countryType).isRequired,
+  populous: PropTypes.bool.isRequired,
+};
+
 // get data
 function DataPage({ page }) {
   const [data, setData] = useState(null);
@@ -106,7 +123,7 @@ function DataPage({ page }) {
       </>
     );
   }
-  //populous page
+  // Populous page
   return (
     <>
       <p>{data.countries.length} countries</p>
@@ -115,9 +132,19 @@ function DataPage({ page }) {
     </>
   );
 }
+DataPage.propTypes = {
+  page: PropTypes.oneOf(['countries', 'populous', 'regions']).isRequired,
+};
+
 // return nav bar and main section
 function App() {
   const page = window.location.pathname.replace(/^\/|\/$/g, '') || 'home';
+  let content = <a href="/home">Go home</a>;
+  if (page === 'home') {
+    content = <p>Welcome! Use the links above to view countries, populations, and regions.</p>;
+  } else if (pages[page]) {
+    content = <DataPage page={page} />;
+  }
   return (
     <>
       <nav aria-label="Main navigation">
@@ -129,13 +156,7 @@ function App() {
       </nav>
       <main>
         <h1>{pages[page] || 'Page not found'}</h1>
-        {page === 'home' ? (
-          <p>Welcome! Use the links above to view countries, populations, and regions.</p>
-        ) : pages[page] ? (
-          <DataPage page={page} />
-        ) : (
-          <a href="/home">Go home</a>
-        )}
+        {content}
       </main>
     </>
   );

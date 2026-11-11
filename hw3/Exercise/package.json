@@ -7,13 +7,15 @@
     "start": "npm run build && node --env-file-if-exists=.env back-end.js",
     "dev": "npm start",
     "build": "vite build",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "lint": "eslint . --ext .js,.jsx,.mjs --max-warnings=0"
   },
   "engines": {
     "node": ">=20.19.0"
   },
   "dependencies": {
     "express": "^4.21.2",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vite": "^6.1.0"

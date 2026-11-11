@@ -1,30 +1,41 @@
 const COUNTRIES_API = 'https://api.restcountries.com/countries/v5';
 const CACHE_MS = 10 * 60 * 1000;
 
-function text(value, fallback = '') {
+function nonEmptyString(value, fallback = '') {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
 function normalizeCountry(record, index) {
   const country = record && typeof record === 'object' ? record : {};
-  const flagUrl = text(country.flag?.url_svg || country.flag?.url_png);
-  const name = text(country.names?.common, text(country.names?.official, 'Unknown country'));
+
+  const flagUrl = nonEmptyString(country.flag?.url_svg || country.flag?.url_png);
+
+  const name = nonEmptyString(country.names?.common, nonEmptyString(country.names?.official, 'Unknown country'));
+
   return {
-    id: text(country.codes?.alpha_3, `unknown-${index}`),
+    id: nonEmptyString(country.codes?.alpha_3, `unknown-${index}`),
     name,
     capitals: Array.isArray(country.capitals)
-      ? country.capitals.map((capital) => text(capital?.name)).filter(Boolean)
+      ? country.capitals.map((capital) => nonEmptyString(capital?.name)).filter(Boolean)
       : [],
-    region: text(country.region, 'Unspecified region'),
+    region: nonEmptyString(country.region, 'Unspecified region'),
     population:
       typeof country.population === 'number' &&
-      Number.isFinite(country.population) &&
-      country.population >= 0
+        Number.isFinite(country.population) &&
+        country.population >= 0
         ? country.population
         : null,
     flag: flagUrl.startsWith('https://') ? flagUrl : '',
-    flagAlt: text(country.flag?.description, `Flag of ${name}`),
-    leaders: [],
+    flagAlt: nonEmptyString(country.flag?.description, `Flag of ${name}`),
+    currencies: Array.isArray(country.currencies)
+      ? country.currencies
+          .filter((currency) => currency && typeof currency === 'object')
+          .map((currency) => ({
+            code: nonEmptyString(currency.code),
+            name: nonEmptyString(currency.name, nonEmptyString(currency.code, 'Unknown currency')),
+            symbol: nonEmptyString(currency.symbol),
+          }))
+      : [],
   };
 }
 
@@ -50,7 +61,7 @@ async function getCountryRecords(apiKey) {
     url.search = new URLSearchParams({
       limit: '100',
       offset: String(offset),
-      response_fields: 'names.common,names.official,codes.alpha_3,capitals,population,flag,region',
+      response_fields: 'names.common,names.official,codes.alpha_3,capitals,population,flag,region,currencies',
     });
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${apiKey}` },
@@ -89,8 +100,6 @@ async function loadCountries() {
         .sort((a, b) => a.name.localeCompare(b.name, 'en'));
       const data = {
         countries,
-        leaderNotice:
-          'Leader information is unavailable in this exercise. All other available country records are included.',
         updatedAt: new Date().toISOString(),
       };
       cached = { time: Date.now(), data };
