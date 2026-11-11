@@ -1,0 +1,16 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+article {
+  border: 1px solid #ccc;
+  margin: 12px 0;
+  padding: 12px;
+}

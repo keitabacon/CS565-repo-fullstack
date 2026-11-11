@@ -1,0 +1,65 @@
+#!/usr/bin/env node
+
+const debug = require('debug')('express-locallibrary-tutorial:server');
+const http = require('http');
+const mongoose = require('mongoose');
+const app = require('../app');
+
+// Normalize the port into a number, named pipe, or false.
+function normalizePort(value) {
+  const parsedPort = parseInt(value, 10);
+  if (Number.isNaN(parsedPort)) return value;
+  return parsedPort >= 0 ? parsedPort : false;
+}
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+const mongoDB = process.env.MONGODB_URI;
+const server = http.createServer(app);
+
+function onError(error) {
+  if (error.syscall !== 'listen') throw error;
+
+  const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
+  switch (error.code) {
+    case 'EACCES':
+      process.stderr.write(`${bind} requires elevated privileges\n`);
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      process.stderr.write(`${bind} is already in use\n`);
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+function onListening() {
+  const address = server.address();
+  const bind = typeof address === 'string' ? `pipe ${address}` : `port ${address.port}`;
+  debug(`Listening on ${bind}`);
+}
+
+function startServer() {
+  server.on('error', onError);
+  server.on('listening', onListening);
+  server.listen(port);
+}
+
+async function connectMongoose() {
+  await mongoose.connect(mongoDB);
+  mongoose.connection.on('error', (err) => {
+    process.stderr.write(`MongoDB connection error: ${err.stack || err}\n`);
+  });
+  mongoose.connection.on('disconnected', () => {
+    process.stderr.write('MongoDB disconnected\n');
+  });
+}
+
+connectMongoose()
+  .then(startServer)
+  .catch((err) => {
+    process.stderr.write(`Failed to connect to MongoDB: ${err.stack || err}\n`);
+    process.exit(1);
+  });
